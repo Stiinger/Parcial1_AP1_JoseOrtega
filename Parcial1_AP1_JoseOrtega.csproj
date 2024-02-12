@@ -18,4 +18,14 @@
     <Folder Include="Data\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Components\App.razor" />
+    <None Include="Components\Layout\MainLayout.razor" />
+    <None Include="Components\Layout\NavMenu.razor" />
+    <None Include="Components\Pages\Error.razor" />
+    <None Include="Components\Pages\Home.razor" />
+    <None Include="Components\Routes.razor" />
+    <None Include="Components\_Imports.razor" />
+  </ItemGroup>
+
 </Project>
