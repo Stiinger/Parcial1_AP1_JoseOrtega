@@ -1,10 +1,16 @@
-using Parcial1_AP1_JoseOrtega.Components;
+using Microsoft.EntityFrameworkCore;
+using Parcial1_AP1_JoseOrtega.DAL;
+using Parcial1_AP1_JoseOrtega.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+var ConStr = builder.Configuration.GetConnectionString("ConStr");
+builder.Services.AddDbContext<Contexto>(op => op.UseSqlite(ConStr));
+builder.Services.AddScoped<MetasService>();
 
 var app = builder.Build();
 
