@@ -1,0 +1,61 @@
+﻿@page "/EliminarMeta"
+@page "/EliminarMeta/{metaId:int}"
+
+@rendermode InteractiveServer
+@inject MetasService metaService;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Eliminar Meta</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header">
+			<h3><strong>Eliminar Meta</strong></h3>
+		</div>
+		<div class="card-body">
+			<h5><strong>¿Seguro quieres eliminar esta meta?</strong></h5>
+
+			<div>
+				<p class="mb-2"><strong>Id:</strong> @meta.MetaId</p>
+			</div>
+			<div>
+				<p class="mb-2"><strong>Descripci&oacute;n:</strong> @meta.Descripcion</p>
+			</div>
+			<div>
+				<p class="mb-2"><strong>Fecha:</strong> @meta.Fecha.ToShortDateString()</p>
+			</div>
+			<div>
+				<p class="mb-2"><strong>Monto:</strong> @meta.Monto.ToString("N2")</p>
+			</div>
+
+			<button type="button" class="btn btn-danger" @onclick="Eliminar"><i class="bi bi-trash3"></i> Eliminar</button>
+			<button type="button" class="btn btn-dark" @onclick="VolverAtras"><i class="bi bi-x-octagon"></i> Cancelar</button>
+		</div>
+		@Mensaje
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public int metaId { get; set; }
+	public Metas meta { get; set; } = new Metas();
+	public string Mensaje { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		meta = await metaService.Buscar(metaId);
+	}
+
+	public async Task Eliminar()
+	{
+		var metaEliminada = await metaService.Eliminar(meta);
+		if (metaEliminada)
+			VolverAtras();
+		else
+			Mensaje = "No se ha podido eliminar la meta.";
+	}
+
+	void VolverAtras()
+	{
+		NavigationManager.NavigateTo("/DetallesMetas");
+	}
+}
