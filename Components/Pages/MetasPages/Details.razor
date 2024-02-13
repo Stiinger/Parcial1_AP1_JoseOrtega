@@ -1,0 +1,68 @@
+﻿@page "/DetallesMetas"
+@inject MetasService metaService;
+
+<PageTitle>Detalles Metas</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header">
+			<h3><strong>Detalles de Metas</strong></h3>
+				<div class="row">
+					<div class="col">
+						<a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill float-start"> Crear</a>
+					</div>
+					<div class="col">
+						<a href="/Metas" class="btn btn-dark bi bi-list float-end"> Volver</a>
+					</div>
+				</div>
+		</div>
+		<div class="card-body">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Descripci&oacute;n</th>
+						<th>Fecha</th>
+						<th>Sueldo</th>
+					</tr>
+				</thead>
+				<thBody>
+					@foreach (var meta in listaMetas)
+					{
+						<tr>
+							<td>@meta.MetaId</td>
+							<td>@meta.Descripcion</td>
+							<td>@meta.Fecha.ToShortDateString()</td>
+							<td>@meta.Monto.ToString("N2")</td>
+							<td>
+								<a href="/EditarMeta/@meta.MetaId"><i class="bi bi-pencil-square"></i></a>
+								<a href="/EliminarMeta/@meta.MetaId"><i class="bi bi-trash3"></i></a>
+							</td>
+						</tr>
+					}
+				</thBody>
+			</table>
+		</div>
+		<div class="card-footer">
+			<div class="row">
+				<div class="col">
+					<p class="float-start"><strong>Cantidad de Metas:</strong> @listaMetas.Count</p>
+				</div>
+				<div class="col">
+					<p class="float-end"><strong>Total Montos:</strong> @TotalMontos.ToString("N2")</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	public Metas meta { get; set; } = new Metas();
+	public List<Metas> listaMetas = new List<Metas>();
+	public decimal TotalMontos { get; set; }
+
+	protected override void OnInitialized()
+	{
+		listaMetas = metaService.Listar(m => m.MetaId > 0);
+		TotalMontos = listaMetas.Sum(m => m.Monto);
+	}
+}
