@@ -1,0 +1,94 @@
+﻿@page "/EditarMeta"
+@page "/EditarMeta/{metaId:int}"
+
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject MetasService metaService
+
+<PageTitle>Editar Meta</PageTitle>
+
+<EditForm Model="meta" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3><strong>Editar Meta</strong></h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-2">
+                        <label>Meta Id:</label>
+                        <InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label>Descripci&oacute;n:</label>
+                        <InputText class="form-control" @bind-Value="meta.Descripcion"></InputText>
+                        <ValidationMessage For="@(() => meta.Descripcion)"></ValidationMessage>
+                    </div>
+                    <div class="col-3">
+                        <label>Fecha:</label>
+                        <InputDate class="form-control" @bind-Value="meta.Fecha"></InputDate>
+                        <ValidationMessage For="@(() => meta.Fecha)"></ValidationMessage>
+                    </div>
+                    <div class="col-2">
+                        <label>Monto:</label>
+                        <InputNumber class="form-control" @bind-Value="meta.Monto"></InputNumber>
+                        <ValidationMessage For="@(() => meta.Monto)"></ValidationMessage>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-floppy-fill" /> Modificar</button>
+                <div class="col d-flex justify-content-end"><a href="/DetallesMetas" class="btn btn-dark"> Volver</a></div>
+            </div>
+        </div>
+    </div>
+    @Mensaje
+</EditForm>
+
+@code {
+    [Parameter]
+    public int metaId { get; set; }
+    public Metas meta { get; set; } = new Metas();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        meta = await metaService.Buscar(metaId);
+    }
+
+    public async Task Modificar()
+    {
+        if (await metaService.Guardar(this.meta))
+            VolverAtras();
+        else
+            Mensaje = "No se pudo modificar la meta.";
+    }
+
+    void VolverAtras()
+    {
+        NavigationManager.NavigateTo("/DetallesMetas");
+    }
+
+    public async Task Buscar()
+    {
+        if (meta.MetaId <= 0)
+            Mensaje = "Ingrese un ID válido.";
+        else
+        {
+            var metaEncontrada = await metaService.Buscar(meta.MetaId);
+            if (metaEncontrada != null)
+            {
+                meta = metaEncontrada;
+                Mensaje = String.Empty;
+            }
+            else
+            {
+                Mensaje = "No se ha encontrado ninguna Meta con el ID ingresado.";
+                VolverAtras();
+            }
+        }
+    }
+}
