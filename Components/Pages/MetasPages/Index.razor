@@ -1,0 +1,52 @@
+﻿@page "/Metas"
+@inject MetasService metasService;
+
+<PageTitle>Metas</PageTitle>
+
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header">
+			<h3><strong>Metas</strong></h3>
+			<div class="row">
+				<div class="col-2">
+					<a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill"> Crear</a>
+				</div>
+				<div class="col-2">
+					<a href="/DetallesMetas" class="btn btn-secondary bi bi-card-list"> Detalles</a>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Descripci&oacute;n</th>
+						<th>Fecha</th>
+						<th>Monto</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var meta in listaMetas)
+					{
+						<tr>
+							<td>@meta.MetaId</td>
+							<td>@meta.Descripcion</td>
+							<td>@meta.Fecha.ToShortDateString()</td>
+							<td>@meta.Monto.ToString("N2")</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<Metas> listaMetas = new List<Metas>();
+
+	protected override void OnInitialized()
+	{
+		listaMetas = metasService.Listar(m => m.MetaId > 0);
+	}
+}
