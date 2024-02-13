@@ -1,0 +1,90 @@
+﻿@page "/CrearMeta"
+@inject MetasService metaService
+@rendermode InteractiveServer
+
+<PageTitle>Crear Nueva Meta</PageTitle>
+
+<EditForm Model="meta" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3><strong>Crear Nueva Meta</strong></h3>
+                <a href="/DetallesMetas" class="btn btn-secondary bi bi-card-list"> Detalles</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-2">
+                        <label>Meta Id:</label>
+                        <InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label>Descripci&oacute;n:</label>
+                        <InputText class="form-control" @bind-Value="meta.Descripcion"></InputText>
+                        <ValidationMessage For="@(() => meta.Descripcion)"></ValidationMessage>
+                    </div>
+                    <div class="col-3">
+                        <label>Fecha:</label>
+                        <InputDate class="form-control" @bind-Value="meta.Fecha"></InputDate>
+                        <ValidationMessage For="@(() => meta.Fecha)"></ValidationMessage>
+                    </div>
+                    <div class="col-2">
+                        <label>Monto:</label>
+                        <InputNumber class="form-control" @bind-Value="meta.Monto"></InputNumber>
+                        <ValidationMessage For="@(() => meta.Monto)"></ValidationMessage>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+                <button type="submit" class="btn btn-outline-success"><i class="bi bi-floppy-fill" /> Crear</button>
+                <div class="col d-flex justify-content-end"><a href="/Metas" class="btn btn-dark"> Volver</a></div>
+            </div>
+        </div>
+    </div>
+    @Mensaje
+</EditForm>
+@code {
+    public Metas meta { get; set; } = new Metas();
+    public string Mensaje { get; set; } = string.Empty;
+
+    public async Task Crear()
+    {
+        if (await metaService.Guardar(this.meta))
+        {
+            Nuevo();
+            Mensaje = "Se guardó correctamente la meta.";
+        }
+        else
+        {
+            Nuevo();
+            Mensaje = "No se pudo guardar la meta.";
+        }
+    }
+    public void Nuevo()
+    {
+        meta = new Metas();
+        Mensaje = string.Empty;
+    }
+
+    public async Task Buscar()
+    {
+        if (meta.MetaId <= 0)
+            Mensaje = "Ingrese un ID válido.";
+        else
+        {
+            var metaEncontrada = await metaService.Buscar(meta.MetaId);
+            if (metaEncontrada != null)
+            {
+                meta = metaEncontrada;
+                Mensaje = string.Empty;
+            }
+            else
+            {
+                Nuevo();
+                Mensaje = "No se ha encontrado ninguna Meta con el ID ingresado.";
+            }
+        }
+    }
+}
