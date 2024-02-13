@@ -9,7 +9,7 @@ public class Metas
     public int MetaId { get; set; }
     [Required(ErrorMessage = "Es obligatorio introducir la descripción.")]
     public string Descripcion { get; set; } = string.Empty;
-    public DateTime Fecha { get; set; }
+    public DateTime Fecha { get; set; } = DateTime.Today;
     [Range(1, 1000000000, ErrorMessage = "El monto debe ser mayor a 0.")]
     public decimal Monto { get; set; }
 }
