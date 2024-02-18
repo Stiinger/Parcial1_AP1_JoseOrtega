@@ -1,68 +1,45 @@
 ﻿@page "/DetallesMetas"
-@inject MetasService metaService;
+@page "/DetallesMetas/MetaId={metaId:int}"
 
-<PageTitle>Detalles Metas</PageTitle>
+@inject MetasService metaService
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@inject NavigationManager navigation
+
+<PageTitle>Detalles Meta</PageTitle>
 <div class="container">
 	<div class="card shadow-lg">
 		<div class="card-header">
-			<h3><strong>Detalles de Metas</strong></h3>
-				<div class="row">
-					<div class="col">
-						<a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill float-start"> Crear</a>
-					</div>
-					<div class="col">
-						<a href="/Metas" class="btn btn-dark bi bi-list float-end"> Volver</a>
-					</div>
-				</div>
+			<h3><strong>Detalles de Meta</strong></h3>
 		</div>
-		<div class="card-body">
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th>Id</th>
-						<th>Descripci&oacute;n</th>
-						<th>Fecha</th>
-						<th>Sueldo</th>
-					</tr>
-				</thead>
-				<thBody>
-					@foreach (var meta in listaMetas)
-					{
-						<tr>
-							<td>@meta.MetaId</td>
-							<td>@meta.Descripcion</td>
-							<td>@meta.Fecha.ToShortDateString()</td>
-							<td>@meta.Monto.ToString("N2")</td>
-							<td>
-								<a href="/EditarMeta/@meta.MetaId"><i class="bi bi-pencil-square"></i></a>
-								<a href="/EliminarMeta/@meta.MetaId"><i class="bi bi-trash3"></i></a>
-							</td>
-						</tr>
-					}
-				</thBody>
-			</table>
+		<div class="card-body col-5">
+			<h3><strong>Informaci&oacute;n de la meta #@metaId</strong></h3>
+			<div class="mb-1">
+				<p class="mb-2"><strong>MetaId:</strong> @meta.MetaId</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Fecha:</strong> @meta.Fecha.ToShortDateString()</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Descripci&oacute;n:</strong> @meta.Descripcion</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Monto:</strong> @meta.Monto.ToString("N2")</p>
+			</div>
 		</div>
 		<div class="card-footer">
-			<div class="row">
-				<div class="col">
-					<p class="float-start"><strong>Cantidad de Metas:</strong> @listaMetas.Count</p>
-				</div>
-				<div class="col">
-					<p class="float-end"><strong>Total Montos:</strong> @TotalMontos.ToString("N2")</p>
-				</div>
-			</div>
+			<div class="col d-flex justify-content-end"><a href="/Metas" class="btn btn-dark"> Volver</a></div>
 		</div>
 	</div>
 </div>
 
 @code {
+	[Parameter]
+	public int metaId { get; set; }
 	public Metas meta { get; set; } = new Metas();
-	public List<Metas> listaMetas = new List<Metas>();
-	public decimal TotalMontos { get; set; }
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
-		listaMetas = metaService.Listar(m => m.MetaId > 0);
-		TotalMontos = listaMetas.Sum(m => m.Monto);
+		meta = await metaService.Buscar(metaId);
 	}
 }
