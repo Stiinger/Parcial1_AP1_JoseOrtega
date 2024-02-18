@@ -2,80 +2,172 @@
 @inject MetasService metasService;
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-
 <PageTitle>Metas</PageTitle>
 
 <div class="container">
-	<div class="card shadow-lg">
-		<div class="card-header">
-			<h3><strong>Metas</strong></h3>
-			<div class="row">
-				<div class="col-2">
-					<a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill"> Crear</a>
-				</div>
-			</div>
-		</div>
-		<div class="card-body">
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th>MetaId</th>
-						<th>Descripci&oacute;n</th>
-						<th>Fecha</th>
-						<th>Monto</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var meta in listaMetas)
-					{
-						<tr>
-							<td>@meta.MetaId</td>
-							<td>@meta.Descripcion</td>
-							<td>@meta.Fecha.ToShortDateString()</td>
-							<td>@meta.Monto.ToString("N2")</td>
-							<td><button type="button" class="btn btn-info" @onclick="(e) => IrDetalle(meta.MetaId)"><i class="bi bi-eye" /> Detalles</button></td>
-							<td><button type="button" class="btn btn-warning" @onclick="(e) => IrEditar(meta.MetaId)"><i class="bi bi-pencil-square" /> Editar</button></td>
-							<td><button type="button" class="btn btn-danger" @onclick="(e) => IrEliminar(meta.MetaId)"><i class="bi bi-trash3-fill" /> Eliminar</button></td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
-		<div class="card-footer">
-			<div class="row">
-				<div class="col">
-					<p class="float-start"><strong>Cantidad de Metas:</strong> @listaMetas.Count</p>
-				</div>
-				<div class="col">
-					<p class="float-end"><strong>Total Montos:</strong> @TotalMontos.ToString("N2")</p>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3><strong>Metas</strong></h3>
+            <div class="row">
+                <div class="col-2">
+                    <a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill"> Crear</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <label>Filtrar por:</label>
+                <div class="col-2">
+                    <InputSelect class="form-select" @bind-Value="OpcionFiltro">
+                        <option disabled selected value="0">Seleccionar</option>
+                        <option value="1">Meta Id</option>
+                        <option value="2">Descripci&oacute;n</option>
+                        <option value="3">Fecha</option>
+                    </InputSelect>
+                </div>
+                <div class="col-auto">
+                    @switch (OpcionFiltro)
+                    {
+                        case 1:
+                            <div class="input-group row">
+                                <InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Filtrar"> </button>
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise" @onclick="ReiniciarFiltro"> </button>
+                                </div>
+                            </div>
+                            break;
+                        case 2:
+                            <div class="input-group row">
+                                <InputText class="form-control" @bind-Value="meta.Descripcion"></InputText>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Filtrar"> </button>
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise" @onclick="ReiniciarFiltro"> </button>
+                                </div>
+                            </div>
+                            break;
+                        case 3:
+                            <div class="input-group row">
+                                <div class="col-4">
+                                    <InputDate class="form-control" @bind-Value="fechaInicio"></InputDate>
+                                </div>
+                                <div class="col-4">
+                                    <InputDate class="form-control" @bind-Value="fechaFinal"></InputDate>
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Filtrar"> </button>
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise" @onclick="ReiniciarFiltro"> </button>
+                                </div>
+                            </div>
+                            break;
+                    }
+                </div>
+            </div>
+        </div>
+        @if (listaMetas.Count() == 0)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="bi bi-info-circle-fill"></i> No hay metas para mostrar.</h3>
+                </div>
+            </div>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>MetaId</th>
+                        <th>Descripci&oacute;n</th>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var meta in listaMetas)
+                    {
+                        <tr>
+                            <td>@meta.MetaId</td>
+                            <td>@meta.Descripcion</td>
+                            <td>@meta.Fecha.ToShortDateString()</td>
+                            <td>@meta.Monto.ToString("N2")</td>
+                            <td><button type="button" class="btn btn-info" @onclick="(e) => IrDetalle(meta.MetaId)"><i class="bi bi-eye"></i> Detalles</button></td>
+                            <td><button type="button" class="btn btn-warning" @onclick="(e) => IrEditar(meta.MetaId)"><i class="bi bi-pencil-square"></i> Editar</button></td>
+                            <td><button type="button" class="btn btn-danger" @onclick="(e) => IrEliminar(meta.MetaId)"><i class="bi bi-trash3-fill"></i> Eliminar</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="card-footer">
+            <div class="row">
+                <div class="col">
+                    <p class="float-start"><strong>Cantidad de Metas:</strong> @listaMetas.Count</p>
+                </div>
+                <div class="col">
+                    <p class="float-end"><strong>Total Montos:</strong> @TotalMontos.ToString("N2")</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
-	public List<Metas> listaMetas = new List<Metas>();
-	public decimal TotalMontos { get; set; }
+    public List<Metas> listaMetas = new List<Metas>();
+    public decimal TotalMontos { get; set; }
+    private Metas meta { get; set; } = new Metas();
+    private int OpcionFiltro { get; set; } = 0;
+    private DateTime fechaInicio { get; set; }
+    private DateTime fechaFinal { get; set; }
 
-	protected override void OnInitialized()
-	{
-		listaMetas = metasService.Listar(m => m.MetaId > 0);
-		TotalMontos = listaMetas.Sum(m => m.Monto);
-	}
+    protected override void OnInitialized()
+    {
+        listaMetas = metasService.Listar(m => m.MetaId > 0);
+        TotalMontos = listaMetas.Sum(m => m.Monto);
+        fechaInicio = fechaFinal = DateTime.Today;
+    }
 
-	public void IrEditar(int metaId)
-	{
-		NavigationManager.NavigateTo($"/EditarMeta/MetaId={metaId}");
-	}
+    public void IrEditar(int metaId)
+    {
+        NavigationManager.NavigateTo($"/EditarMeta/MetaId={metaId}");
+    }
 
-	public void IrEliminar(int metaId)
-	{
-		NavigationManager.NavigateTo($"/EliminarMeta/MetaId={metaId}");
-	}
+    public void IrEliminar(int metaId)
+    {
+        NavigationManager.NavigateTo($"/EliminarMeta/MetaId={metaId}");
+    }
 
-	public void IrDetalle(int metaId)
-	{
-		NavigationManager.NavigateTo($"DetallesMetas/MetaId={metaId}");
-	}
+    public void IrDetalle(int metaId)
+    {
+        NavigationManager.NavigateTo($"DetallesMetas/MetaId={metaId}");
+    }
+
+    public async Task Filtrar()
+    {
+        switch (OpcionFiltro)
+        {
+            case 1:
+                listaMetas = metasService.Listar(m => m.MetaId == meta.MetaId);
+                break;
+            case 2:
+                listaMetas = metasService.Listar(m => m.Descripcion == meta.Descripcion);
+                break;
+            case 3:
+                listaMetas = metasService.Listar(m => m.Fecha <= fechaFinal && m.Fecha >= fechaInicio);
+                break;
+        }
+        TotalMontos = listaMetas.Sum(m => m.Monto);
+    }
+
+    public async Task ReiniciarFiltro()
+    {
+        listaMetas = metasService.Listar(m => m.MetaId > 0);
+        TotalMontos = listaMetas.Sum(m => m.Monto);
+    }
 }
