@@ -48,6 +48,13 @@ public class MetasService
             .FirstOrDefaultAsync(m  => m.MetaId == metaId);
     }
 
+    public async Task<Metas?> BuscarDescripcion(string descripcion)
+    {
+        return await _contexto.Metas
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Descripcion == descripcion);
+    }
+
     public async Task<bool> Eliminar(Metas meta)
     {
         return await _contexto.Metas
