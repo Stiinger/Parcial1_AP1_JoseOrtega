@@ -1,5 +1,7 @@
 ﻿@page "/Metas"
 @inject MetasService metasService;
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>Metas</PageTitle>
 
@@ -11,16 +13,13 @@
 				<div class="col-2">
 					<a href="/CrearMeta" class="btn btn-success bi bi-file-earmark-diff-fill"> Crear</a>
 				</div>
-				<div class="col-2">
-					<a href="/DetallesMetas" class="btn btn-secondary bi bi-card-list"> Detalles</a>
-				</div>
 			</div>
 		</div>
 		<div class="card-body">
-			<table class="table">
+			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th>Id</th>
+						<th>MetaId</th>
 						<th>Descripci&oacute;n</th>
 						<th>Fecha</th>
 						<th>Monto</th>
@@ -34,19 +33,49 @@
 							<td>@meta.Descripcion</td>
 							<td>@meta.Fecha.ToShortDateString()</td>
 							<td>@meta.Monto.ToString("N2")</td>
+							<td><button type="button" class="btn btn-info" @onclick="(e) => IrDetalle(meta.MetaId)"><i class="bi bi-eye" /> Detalles</button></td>
+							<td><button type="button" class="btn btn-warning" @onclick="(e) => IrEditar(meta.MetaId)"><i class="bi bi-pencil-square" /> Editar</button></td>
+							<td><button type="button" class="btn btn-danger" @onclick="(e) => IrEliminar(meta.MetaId)"><i class="bi bi-trash3-fill" /> Eliminar</button></td>
 						</tr>
 					}
 				</tbody>
 			</table>
+		</div>
+		<div class="card-footer">
+			<div class="row">
+				<div class="col">
+					<p class="float-start"><strong>Cantidad de Metas:</strong> @listaMetas.Count</p>
+				</div>
+				<div class="col">
+					<p class="float-end"><strong>Total Montos:</strong> @TotalMontos.ToString("N2")</p>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 
 @code {
 	public List<Metas> listaMetas = new List<Metas>();
+	public decimal TotalMontos { get; set; }
 
 	protected override void OnInitialized()
 	{
 		listaMetas = metasService.Listar(m => m.MetaId > 0);
+		TotalMontos = listaMetas.Sum(m => m.Monto);
+	}
+
+	public void IrEditar(int metaId)
+	{
+		NavigationManager.NavigateTo($"/EditarMeta/MetaId={metaId}");
+	}
+
+	public void IrEliminar(int metaId)
+	{
+		NavigationManager.NavigateTo($"/EliminarMeta/MetaId={metaId}");
+	}
+
+	public void IrDetalle(int metaId)
+	{
+		NavigationManager.NavigateTo($"DetallesMetas/MetaId={metaId}");
 	}
 }
