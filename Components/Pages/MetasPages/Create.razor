@@ -10,12 +10,11 @@
         <div class="card shadow-lg">
             <div class="card-header">
                 <h3><strong>Crear Nueva Meta</strong></h3>
-                <a href="/DetallesMetas" class="btn btn-secondary bi bi-card-list"> Detalles</a>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-2">
-                        <label>Meta Id:</label>
+                        <label>MetaId:</label>
                         <InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
                     </div>
                 </div>
@@ -51,17 +50,23 @@
 
     public async Task Crear()
     {
-        if (await metaService.Guardar(this.meta))
+        if(!await Validar())
         {
-            Nuevo();
-            Mensaje = "Se guardó correctamente la meta.";
+            if (await metaService.Guardar(this.meta))
+            {
+                Nuevo();
+                Mensaje = "Se guardó correctamente la meta.";
+            }
+            else
+            {
+                Nuevo();
+                Mensaje = "No se pudo guardar la meta.";
+            }
         }
         else
-        {
-            Nuevo();
-            Mensaje = "No se pudo guardar la meta.";
-        }
+            Mensaje = "Ya existe una meta con esta descripción.";
     }
+
     public void Nuevo()
     {
         meta = new Metas();
@@ -86,5 +91,11 @@
                 Mensaje = "No se ha encontrado ninguna Meta con el ID ingresado.";
             }
         }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var descripcion = await metaService.BuscarDescripcion(meta.Descripcion);
+        return descripcion != null;
     }
 }

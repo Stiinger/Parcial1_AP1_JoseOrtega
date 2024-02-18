@@ -1,5 +1,5 @@
 ﻿@page "/EditarMeta"
-@page "/EditarMeta/{metaId:int}"
+@page "/EditarMeta/MetaId={metaId:int}"
 
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
@@ -17,7 +17,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-2">
-                        <label>Meta Id:</label>
+                        <label>MetaId:</label>
                         <InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
             </div>
             <div class="card-footer d-flex justify-content-center">
                 <button type="submit" class="btn btn-outline-primary"><i class="bi bi-floppy-fill" /> Modificar</button>
-                <div class="col d-flex justify-content-end"><a href="/DetallesMetas" class="btn btn-dark"> Volver</a></div>
+                <div class="col d-flex justify-content-end"><a href="/Metas" class="btn btn-dark"> Volver</a></div>
             </div>
         </div>
     </div>
@@ -53,42 +53,35 @@
     public int metaId { get; set; }
     public Metas meta { get; set; } = new Metas();
     public string Mensaje { get; set; } = string.Empty;
+    public string descripcionActual { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         meta = await metaService.Buscar(metaId);
+        descripcionActual = meta.Descripcion;
     }
 
     public async Task Modificar()
     {
-        if (await metaService.Guardar(this.meta))
-            VolverAtras();
+        if (!await Validar())
+        {
+            if (await metaService.Guardar(this.meta))
+                VolverAtras();
+            else
+                Mensaje = "No se pudo modificar la meta.";
+        }
         else
-            Mensaje = "No se pudo modificar la meta.";
+            Mensaje = "Ya existe una meta con esta descripción.";
     }
 
     void VolverAtras()
     {
-        NavigationManager.NavigateTo("/DetallesMetas");
+        NavigationManager.NavigateTo("/Metas");
     }
 
-    public async Task Buscar()
+    public async Task<bool> Validar()
     {
-        if (meta.MetaId <= 0)
-            Mensaje = "Ingrese un ID válido.";
-        else
-        {
-            var metaEncontrada = await metaService.Buscar(meta.MetaId);
-            if (metaEncontrada != null)
-            {
-                meta = metaEncontrada;
-                Mensaje = String.Empty;
-            }
-            else
-            {
-                Mensaje = "No se ha encontrado ninguna Meta con el ID ingresado.";
-                VolverAtras();
-            }
-        }
+        var metaBuscada = await metaService.BuscarDescripcion(meta.Descripcion);
+        return metaBuscada != null && metaBuscada.Descripcion != descripcionActual;
     }
 }
